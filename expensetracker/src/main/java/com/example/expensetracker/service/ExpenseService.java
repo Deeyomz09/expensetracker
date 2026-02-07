@@ -1,9 +1,10 @@
 package com.example.expensetracker.service;
-
+import com.example.expensetracker.dto.CategoryTotal;
 import com.example.expensetracker.entity.Expense;
 import com.example.expensetracker.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -40,6 +41,13 @@ public class ExpenseService {
                 .map(Expense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+    }
+    public java.math.BigDecimal getTotalSpent(LocalDate start, LocalDate end) {
+        return repo.sumByDateRange(start, end);
+    }
+
+    public List<CategoryTotal> getTotalsByCategory(LocalDate start, LocalDate end) {
+        return repo.totalsByCategory(start, end);
     }
 
 }

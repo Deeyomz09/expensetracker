@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+<!-- Navbar -->
+<nav class="bg-white border-b">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a th:href="@{/expenses}" class="text-lg font-semibold">ExpenseTracker</a>
+        <div class="flex gap-3">
+            <a th:href="@{/expenses}" class="text-sm text-gray-700 hover:text-black">Expenses</a>
+            <a th:href="@{/dashboard}" class="text-sm text-gray-900 font-semibold">Dashboard</a>
+            <a th:href="@{/expenses/new}"
+               class="text-sm bg-black text-white px-3 py-2 rounded-lg hover:opacity-90">
+                + Add Expense
+            </a>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-5xl mx-auto px-4 py-6">
+
+    <div class="mb-5">
+        <h1 class="text-2xl font-bold">Dashboard</h1>
+        <p class="text-sm text-gray-600">
+            Month: <span class="font-medium" th:text="${monthLabel}">2026-02</span>
+        </p>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white border rounded-xl shadow-sm p-4">
+            <p class="text-xs text-gray-500">Total this month</p>
+            <p class="text-2xl font-bold" th:text="${totalThisMonth}">NT$ 0.00</p>
+        </div>
+
+        <div class="bg-white border rounded-xl shadow-sm p-4">
+            <p class="text-xs text-gray-500">Total last month</p>
+            <p class="text-2xl font-bold" th:text="${totalLastMonth}">NT$ 0.00</p>
+        </div>
+    </div>
+
+    <!-- Breakdown -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Table -->
+        <div class="bg-white border rounded-xl shadow-sm overflow-hidden">
+            <div class="px-4 py-3 border-b">
+                <h2 class="font-semibold">By category (this month)</h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-100">
+                    <tr class="text-left text-sm text-gray-600">
+                        <th class="px-4 py-3">Category</th>
+                        <th class="px-4 py-3 text-right">Total</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                    <tr th:if="${#lists.isEmpty(categoryTotals)}">
+                        <td colspan="2" class="px-4 py-10 text-center text-gray-500">
+                            No expenses this month yet.
+                        </td>
+                    </tr>
+
+                    <tr th:each="row : ${categoryTotals}" class="text-sm hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium" th:text="${row.category()}">Food</td>
+                        <td class="px-4 py-3 text-right" th:text="${row.total()}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white border rounded-xl shadow-sm p-4">
+            <h2 class="font-semibold mb-3">Category chart (this month)</h2>
+            <canvas id="catChart" height="220"></canvas>
+        </div>
+    </div>
+
+</main>
+
+<!-- Chart data from Thymeleaf -->
+<script th:inline="javascript">
+    const labels = /*[[${chartLabels}]]*/ [];
+    const totals = /*[[${chartTotals}]]*/ [];
+
+    const ctx = document.getElementById('catChart');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: totals
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+
+
+</body>
+</html>
