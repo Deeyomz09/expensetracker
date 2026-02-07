@@ -4,7 +4,10 @@ import com.example.expensetracker.entity.Expense;
 import com.example.expensetracker.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+
 
 @Service
 public class ExpenseService {
@@ -30,4 +33,13 @@ public class ExpenseService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    public BigDecimal getTotalSpent(){
+        return repo.findAll()
+                .stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    }
+
 }

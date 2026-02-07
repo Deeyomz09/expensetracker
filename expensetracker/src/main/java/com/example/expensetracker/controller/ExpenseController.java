@@ -8,6 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
+
 @Controller
 public class ExpenseController {
 
@@ -24,9 +28,20 @@ public class ExpenseController {
 
     @GetMapping("/expenses")
     public String list(Model model) {
-        model.addAttribute("expenses", service.findAll());
+
+        var expenses = service.findAll();
+        var total = service.getTotalSpent();
+
+        // Format as NT$ 1,234.00
+        NumberFormat twdFormat = NumberFormat.getCurrencyInstance(Locale.TAIWAN);
+        String formattedTotal = twdFormat.format(total);
+
+        model.addAttribute("expenses", expenses);
+        model.addAttribute("totalSpent", formattedTotal);
+
         return "expenses/list";
     }
+
 
     @GetMapping("/expenses/new")
     public String createForm(Model model) {
