@@ -2,17 +2,12 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy pom first to leverage Docker cache
+# Copy pom first (better caching)
 COPY pom.xml .
-COPY .mvn/ .mvn/
-COPY mvnw mvnw
-COPY mvnw.cmd mvnw.cmd
-
-# Download dependencies (faster rebuilds)
 RUN mvn -q -DskipTests dependency:go-offline
 
 # Copy source and build
-COPY src/ src/
+COPY src ./src
 RUN mvn -DskipTests clean package
 
 # ---- Run stage ----
@@ -20,7 +15,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Render provides $PORT at runtime; Spring must bind to it
+# Render sets $PORT; bind Spring to it
 ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["java","-Dserver.port=${PORT}","-jar","/app/app.jar"]
+ENTRYPOINT ["sh","-c","java -Dserver.port=${PORT} -jar /app/app.jar"]
