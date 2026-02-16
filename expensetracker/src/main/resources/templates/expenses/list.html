@@ -56,8 +56,8 @@
                         </td>
                     </tr>
 
-                    <tr th:each="e : ${expenses}" class="text-sm hover:bg-gray-50">
-                        <td class="px-4 py-3" th:text="${e.id}">1</td>
+                    <tr th:each="e , stat : ${expenses}" class="text-sm hover:bg-gray-50">
+                        <td class="px-4 py-3" th:text="${stat.index + 1}">1</td>
                         <td class="px-4 py-3 font-medium" th:text="${e.description}">Lunch</td>
                         <td class="px-4 py-3" th:text="${e.category}">Food</td>
                         <td class="px-4 py-3" th:text="${e.expenseDate}">2026-02-07</td>

@@ -1,159 +1,104 @@
 <div xmlns:th="http://www.thymeleaf.org"
      th:fragment="layout(content)">
 
-  <!-- Top bar -->
-  <header class="sticky top-0 z-30 bg-white border-b">
-    <div class="h-14 flex items-center justify-between px-4">
-      <div class="flex items-center gap-3">
-        <!-- Toggle button (mobile) -->
-        <button type="button"
-                class="p-2 rounded-lg hover:bg-gray-100"
-                onclick="toggleSidebar()"
-                aria-label="Toggle sidebar">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3 5h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2z" clip-rule="evenodd"/>
-          </svg>
-        </button>
+  <!-- Navbar -->
+  <nav class="bg-white border-gray-200 py-2.5">
+    <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
 
-        <a th:href="@{/expenses}" class="font-semibold">ExpenseTracker</a>
-      </div>
+      <!-- Logo -->
+      <a th:href="@{/expenses}" class="flex items-center">
+        <img th:src="@{/images/logoname.png}"
+             class="h-6 mr-3 sm:h-9"
+             alt="Logo">
 
-      <div class="flex items-center gap-3">
-        <span class="hidden sm:inline text-sm text-gray-500"
-              th:text="${#authentication != null ? #authentication.name : ''}"></span>
+      </a>
 
-        <!-- Logout (POST) -->
-        <form th:action="@{/logout}" method="post" class="inline">
+
+      <!-- Right side -->
+      <div class="flex items-center lg:order-2">
+
+        <!-- Logout Button -->
+        <form th:action="@{/logout}" method="post" class="mr-2">
           <button type="submit"
-                  class="text-sm text-gray-700 hover:text-black bg-transparent border-0 p-0">
+                  class="flex items-center gap-2 text-white bg-red-600 hover:bg-red-700
+                         focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm
+                         px-4 lg:px-5 py-2 lg:py-2.5">
+
+            <!-- Logout Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="w-4 h-4"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5" />
+            </svg>
+
             Logout
           </button>
         </form>
+
+        <!-- Mobile menu button -->
+        <button data-collapse-toggle="mobile-menu-2"
+                type="button"
+                class="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden
+                       hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                aria-controls="mobile-menu-2"
+                aria-expanded="false">
+
+          <span class="sr-only">Open main menu</span>
+
+          <svg class="w-6 h-6"
+               fill="currentColor"
+               viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                  d="M3 5h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2z"
+                  clip-rule="evenodd">
+            </path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Menu -->
+      <div class="items-center justify-between w-full lg:flex lg:w-auto lg:order-1 hidden"
+           id="mobile-menu-2">
+
+        <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+
+          <li>
+            <a th:href="@{/expenses}"
+               class="block py-2 pl-3 pr-4 text-purple-700 lg:p-0">
+              Expenses
+            </a>
+          </li>
+
+          <li>
+            <a th:href="@{/dashboard}"
+               class="block py-2 pl-3 pr-4 text-gray-700 hover:text-purple-700 lg:p-0">
+              Dashboard
+            </a>
+          </li>
+
+          <li>
+            <a th:href="@{/expenses/new}"
+               class="block py-2 pl-3 pr-4 text-gray-700 hover:text-purple-700 lg:p-0">
+              Add Expense
+            </a>
+          </li>
+
+        </ul>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <!-- Overlay (mobile) -->
-  <div id="overlay"
-       class="fixed inset-0 z-40 bg-black/40 hidden sm:hidden"
-       onclick="closeSidebar()"></div>
-
-  <!-- Sidebar -->
-  <aside id="sidebar"
-         class="fixed z-50 top-0 left-0 h-full w-64 bg-white border-r
-                transform -translate-x-full transition-transform duration-200
-                sm:translate-x-0">
-    <div class="h-14 flex items-center px-4 border-b">
-      <span class="font-semibold">METracker</span>
-    </div>
-
-    <nav class="p-3 space-y-1">
-      <a th:href="@{/expenses}"
-         class="block px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
-        Expenses
-      </a>
-
-      <a th:href="@{/dashboard}"
-         class="block px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
-        Dashboard
-      </a>
-
-      <a th:href="@{/expenses/new}"
-         class="block px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
-        + Add Expense
-      </a>
-    </nav>
-  </aside>
-
-  <!-- Push Logout to Bottom -->
-  <div class="mt-auto pt-4 border-t">
-
-    <form th:action="@{/logout}" method="post">
-      <button type="submit"
-              class="w-full text-left px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50">
-        Logout
-      </button>
-    </form>
-
-  </div>
-
-  <!-- Page content (push right on desktop) -->
-  <div class="sm:pl-64">
+  <!-- Page Content -->
+  <main class="max-w-screen-xl mx-auto p-4">
     <div th:replace="${content}"></div>
-  </div>
+  </main>
 
-
-  <script>
-    const SIDEBAR_KEY = "sidebarCollapsed";
-
-    function applyCollapsed(collapsed) {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-      const contentWrap = document.getElementById('contentWrap');
-
-      if (collapsed) {
-        sidebar.classList.add('-translate-x-full');
-        contentWrap.classList.remove('sm:pl-64');
-        overlay.classList.add('hidden');
-        localStorage.setItem(SIDEBAR_KEY, "1");
-      } else {
-        // Desktop open by default; mobile still uses overlay
-        sidebar.classList.remove('-translate-x-full');
-        contentWrap.classList.add('sm:pl-64');
-        localStorage.removeItem(SIDEBAR_KEY);
-      }
-    }
-
-    function openSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-      sidebar.classList.remove('-translate-x-full');
-      // show overlay only on mobile
-      if (window.innerWidth < 640) overlay.classList.remove('hidden');
-    }
-
-    function closeSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-      sidebar.classList.add('-translate-x-full');
-      overlay.classList.add('hidden');
-    }
-
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const isClosed = sidebar.classList.contains('-translate-x-full');
-
-      if (isClosed) {
-        openSidebar();
-        // if desktop, also restore padding
-        if (window.innerWidth >= 640) applyCollapsed(false);
-      } else {
-        // on desktop, collapse + remove padding
-        if (window.innerWidth >= 640) applyCollapsed(true);
-        else closeSidebar();
-      }
-    }
-
-    // On load: collapse on desktop if saved
-    (function initSidebar() {
-      const collapsed = localStorage.getItem(SIDEBAR_KEY) === "1";
-      if (window.innerWidth >= 640) {
-        applyCollapsed(collapsed);
-      } else {
-        // Mobile starts closed
-        closeSidebar();
-      }
-    })();
-
-    // If user resizes window, keep behavior sane
-    window.addEventListener('resize', () => {
-      const collapsed = localStorage.getItem(SIDEBAR_KEY) === "1";
-      if (window.innerWidth >= 640) {
-        applyCollapsed(collapsed);
-      } else {
-        closeSidebar();
-      }
-    });
-  </script>
+  <!-- Flowbite Script -->
+  <script src="https://unpkg.com/flowbite@1.4.1/dist/flowbite.js"></script>
 
 </div>

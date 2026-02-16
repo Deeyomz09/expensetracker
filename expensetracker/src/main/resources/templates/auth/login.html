@@ -8,8 +8,16 @@
 </head>
 
 <body class="bg-gray-50 text-gray-900">
+
 <main class="min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-md bg-white border rounded-2xl shadow-sm p-6">
+
+        <div class="flex justify-center mb-4">
+            <img th:src="@{/images/logoname.png}"
+                 alt="Expense Tracker"
+                 class="h-25 w-auto">
+        </div>
+
         <h1 class="text-2xl font-bold mb-1">Welcome back</h1>
         <p class="text-sm text-gray-600 mb-5">Login to continue</p>
 
@@ -36,7 +44,7 @@
                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring" />
             </div>
 
-            <button type="submit" class="w-full bg-black text-white py-2 rounded-lg hover:opacity-90">
+            <button type="submit" class="w-full bg-sky-500/100 text-white py-2 rounded-lg hover:opacity-90">
                 Login
             </button>
         </form>
