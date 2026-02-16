@@ -1,0 +1,159 @@
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="layout(content)">
+
+  <!-- Top bar -->
+  <header class="sticky top-0 z-30 bg-white border-b">
+    <div class="h-14 flex items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <!-- Toggle button (mobile) -->
+        <button type="button"
+                class="p-2 rounded-lg hover:bg-gray-100"
+                onclick="toggleSidebar()"
+                aria-label="Toggle sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 5h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+
+        <a th:href="@{/expenses}" class="font-semibold">ExpenseTracker</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden sm:inline text-sm text-gray-500"
+              th:text="${#authentication != null ? #authentication.name : ''}"></span>
+
+        <!-- Logout (POST) -->
+        <form th:action="@{/logout}" method="post" class="inline">
+          <button type="submit"
+                  class="text-sm text-gray-700 hover:text-black bg-transparent border-0 p-0">
+            Logout
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- Overlay (mobile) -->
+  <div id="overlay"
+       class="fixed inset-0 z-40 bg-black/40 hidden sm:hidden"
+       onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar"
+         class="fixed z-50 top-0 left-0 h-full w-64 bg-white border-r
+                transform -translate-x-full transition-transform duration-200
+                sm:translate-x-0">
+    <div class="h-14 flex items-center px-4 border-b">
+      <span class="font-semibold">METracker</span>
+    </div>
+
+    <nav class="p-3 space-y-1">
+      <a th:href="@{/expenses}"
+         class="block px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
+        Expenses
+      </a>
+
+      <a th:href="@{/dashboard}"
+         class="block px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
+        Dashboard
+      </a>
+
+      <a th:href="@{/expenses/new}"
+         class="block px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
+        + Add Expense
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Push Logout to Bottom -->
+  <div class="mt-auto pt-4 border-t">
+
+    <form th:action="@{/logout}" method="post">
+      <button type="submit"
+              class="w-full text-left px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50">
+        Logout
+      </button>
+    </form>
+
+  </div>
+
+  <!-- Page content (push right on desktop) -->
+  <div class="sm:pl-64">
+    <div th:replace="${content}"></div>
+  </div>
+
+
+  <script>
+    const SIDEBAR_KEY = "sidebarCollapsed";
+
+    function applyCollapsed(collapsed) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const contentWrap = document.getElementById('contentWrap');
+
+      if (collapsed) {
+        sidebar.classList.add('-translate-x-full');
+        contentWrap.classList.remove('sm:pl-64');
+        overlay.classList.add('hidden');
+        localStorage.setItem(SIDEBAR_KEY, "1");
+      } else {
+        // Desktop open by default; mobile still uses overlay
+        sidebar.classList.remove('-translate-x-full');
+        contentWrap.classList.add('sm:pl-64');
+        localStorage.removeItem(SIDEBAR_KEY);
+      }
+    }
+
+    function openSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.remove('-translate-x-full');
+      // show overlay only on mobile
+      if (window.innerWidth < 640) overlay.classList.remove('hidden');
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+
+      if (isClosed) {
+        openSidebar();
+        // if desktop, also restore padding
+        if (window.innerWidth >= 640) applyCollapsed(false);
+      } else {
+        // on desktop, collapse + remove padding
+        if (window.innerWidth >= 640) applyCollapsed(true);
+        else closeSidebar();
+      }
+    }
+
+    // On load: collapse on desktop if saved
+    (function initSidebar() {
+      const collapsed = localStorage.getItem(SIDEBAR_KEY) === "1";
+      if (window.innerWidth >= 640) {
+        applyCollapsed(collapsed);
+      } else {
+        // Mobile starts closed
+        closeSidebar();
+      }
+    })();
+
+    // If user resizes window, keep behavior sane
+    window.addEventListener('resize', () => {
+      const collapsed = localStorage.getItem(SIDEBAR_KEY) === "1";
+      if (window.innerWidth >= 640) {
+        applyCollapsed(collapsed);
+      } else {
+        closeSidebar();
+      }
+    });
+  </script>
+
+</div>

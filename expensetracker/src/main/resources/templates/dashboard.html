@@ -10,23 +10,7 @@
 
 <body class="bg-gray-50 text-gray-900">
 
-<!-- Navbar -->
-<nav class="bg-white border-b">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a th:href="@{/expenses}" class="text-lg font-semibold">ExpenseTracker</a>
-        <div class="flex gap-3">
-            <a th:href="@{/expenses}" class="text-sm text-gray-700 hover:text-black">Expenses</a>
-            <a th:href="@{/dashboard}" class="text-sm text-gray-900 font-semibold">Dashboard</a>
-            <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit"
-                        class="text-sm text-gray-700 hover:text-black bg-transparent border-0 p-0">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </div>
-</nav>
-
+<div th:replace="fragments/sidebar :: layout(~{::main})">
 <main class="max-w-5xl mx-auto px-4 py-6">
 
     <div class="mb-5">
@@ -96,6 +80,7 @@
     </div>
 
 </main>
+</div>
 
 <!-- Chart data from Thymeleaf -->
 <script th:inline="javascript">

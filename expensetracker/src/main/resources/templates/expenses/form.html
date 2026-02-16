@@ -8,17 +8,7 @@
 </head>
 <body class="bg-gray-50 text-gray-900">
 
-<!-- Navbar -->
-<nav class="bg-white border-b">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a th:href="@{/expenses}" class="text-lg font-semibold">ExpenseTracker</a>
-        <a th:href="@{/dashboard}" class="text-sm text-gray-700 hover:text-black">Dashboard</a>
-
-        <a th:href="@{/expenses}" class="text-sm text-gray-700 hover:text-black">Back</a>
-
-    </div>
-</nav>
-
+<div th:replace="fragments/sidebar :: layout(~{::main})">
 <main class="max-w-3xl mx-auto px-4 py-6">
 
     <div class="mb-5">
@@ -86,5 +76,6 @@
     </div>
 
 </main>
+</div>
 </body>
 </html>

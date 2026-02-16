@@ -8,100 +8,84 @@
 </head>
 <body class="bg-gray-50 text-gray-900">
 
-<!-- Navbar -->
-<nav class="bg-white border-b">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a th:href="@{/expenses}" class="text-lg font-semibold">ExpenseTracker</a>
-        <div class="flex gap-3">
-            <a th:href="@{/expenses}" class="text-sm text-gray-700 hover:text-black">Expenses</a>
-            <a th:href="@{/dashboard}" class="text-sm text-gray-700 hover:text-black">Dashboard</a>
-            <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit"
-                        class="text-sm text-gray-700 hover:text-black bg-transparent border-0 p-0">
-                    Logout
-                </button>
-            </form>
+<div th:replace="fragments/sidebar :: layout(~{::main})">
+    <main class="max-w-5xl mx-auto px-4 py-6">
 
-        </div>
-    </div>
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
+            <div>
+                <h1 class="text-2xl font-bold">Expenses</h1>
+                <p class="text-sm text-gray-600">Track your spending and keep it organized.</p>
+            </div>
 
-</nav>
-
-<main class="max-w-5xl mx-auto px-4 py-6">
-
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-        <div>
-            <h1 class="text-2xl font-bold">Expenses</h1>
-            <p class="text-sm text-gray-600">Track your spending and keep it organized.</p>
+            <!-- Total Spent Card -->
+            <div class="bg-white border rounded-xl px-4 py-3 shadow-sm">
+                <p class="text-xs text-gray-500">Total spent</p>
+                <p class="text-xl font-bold">
+                    <span th:text="${totalSpent}">NT$ 0.00</span>
+                </p>
+            </div>
         </div>
 
-        <!-- Total Spent Card -->
-        <div class="bg-white border rounded-xl px-4 py-3 shadow-sm">
-            <p class="text-xs text-gray-500">Total spent</p>
-            <p class="text-xl font-bold">
-                <span th:text="${totalSpent}">NT$ 0.00</span>
-            </p>
-
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-end gap-3 mb-5">
+            <a th:href="@{/expenses/new}"
+               class="text-sm bg-black text-white px-3 py-2 rounded-lg hover:opacity-90">
+                + Add Expense
+            </a>
         </div>
-    </div>
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-end gap-3 mb-5">
-        <a th:href="@{/expenses/new}"
-           class="text-sm bg-black text-white px-3 py-2 rounded-lg hover:opacity-90">
-            + Add Expense
-        </a>
-    </div>
 
-    <!-- Table -->
-    <div class="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead class="bg-gray-100">
-                <tr class="text-left text-sm text-gray-600">
-                    <th class="px-4 py-3">#</th>
-                    <th class="px-4 py-3">Description</th>
-                    <th class="px-4 py-3">Category</th>
-                    <th class="px-4 py-3">Date</th>
-                    <th class="px-4 py-3 text-right">Amount</th>
-                    <th class="px-4 py-3 text-right">Actions</th>
-                </tr>
-                </thead>
+        <!-- Table -->
+        <div class="bg-white border rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-100">
+                    <tr class="text-left text-sm text-gray-600">
+                        <th class="px-4 py-3">#</th>
+                        <th class="px-4 py-3">Description</th>
+                        <th class="px-4 py-3">Category</th>
+                        <th class="px-4 py-3">Date</th>
+                        <th class="px-4 py-3 text-right">Amount</th>
+                        <th class="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                    </thead>
 
-                <tbody class="divide-y">
-                <tr th:if="${#lists.isEmpty(expenses)}">
-                    <td colspan="6" class="px-4 py-10 text-center text-gray-500">
-                        No expenses yet. Click <span class="font-medium">+ Add Expense</span> to start.
-                    </td>
-                </tr>
+                    <tbody class="divide-y">
+                    <tr th:if="${#lists.isEmpty(expenses)}">
+                        <td colspan="6" class="px-4 py-10 text-center text-gray-500">
+                            No expenses yet. Click <span class="font-medium">+ Add Expense</span> to start.
+                        </td>
+                    </tr>
 
-                <tr th:each="e : ${expenses}" class="text-sm hover:bg-gray-50">
-                    <td class="px-4 py-3" th:text="${e.id}">1</td>
-                    <td class="px-4 py-3 font-medium" th:text="${e.description}">Lunch</td>
-                    <td class="px-4 py-3" th:text="${e.category}">Food</td>
-                    <td class="px-4 py-3" th:text="${e.expenseDate}">2026-02-07</td>
-                    <td class="px-4 py-3 text-right font-semibold" th:text="${e.amount}">120</td>
-                    <td class="px-4 py-3">
-                        <div class="flex justify-end gap-2">
-                            <a th:href="@{/expenses/{id}/edit(id=${e.id})}"
-                               class="text-xs px-3 py-2 rounded-lg border hover:bg-gray-100">
-                                Edit
-                            </a>
+                    <tr th:each="e : ${expenses}" class="text-sm hover:bg-gray-50">
+                        <td class="px-4 py-3" th:text="${e.id}">1</td>
+                        <td class="px-4 py-3 font-medium" th:text="${e.description}">Lunch</td>
+                        <td class="px-4 py-3" th:text="${e.category}">Food</td>
+                        <td class="px-4 py-3" th:text="${e.expenseDate}">2026-02-07</td>
+                        <td class="px-4 py-3 text-right font-semibold" th:text="${e.amount}">120</td>
+                        <td class="px-4 py-3">
+                            <div class="flex justify-end gap-2">
+                                <a th:href="@{/expenses/{id}/edit(id=${e.id})}"
+                                   class="text-xs px-3 py-2 rounded-lg border hover:bg-gray-100">
+                                    Edit
+                                </a>
 
-                            <form th:action="@{/expenses/{id}/delete(id=${e.id})}" method="post">
-                                <button type="submit"
-                                        class="text-xs px-3 py-2 rounded-lg border border-red-200 text-red-700 hover:bg-red-50"
-                                        onclick="return confirm('Delete this expense?')">
-                                    Delete
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                                <form th:action="@{/expenses/{id}/delete(id=${e.id})}" method="post">
+                                    <button type="submit"
+                                            class="text-xs px-3 py-2 rounded-lg border border-red-200 text-red-700 hover:bg-red-50"
+                                            onclick="return confirm('Delete this expense?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-</main>
+    </main>
+</div>
+
 </body>
 </html>

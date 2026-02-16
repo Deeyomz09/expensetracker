@@ -11,6 +11,17 @@ import java.time.LocalDate;
 @Table(name = "expenses")
 public class Expense {
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
+
+    public AppUser getUser() {
+        return user;
+    }
+
+    public void setUser(AppUser user) {
+        this.user = user;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

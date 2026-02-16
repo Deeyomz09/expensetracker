@@ -1,6 +1,8 @@
 package com.example.expensetracker.controller;
 
+import com.example.expensetracker.entity.AppUser;
 import com.example.expensetracker.entity.Expense;
+import com.example.expensetracker.repository.AppUserRepository;
 import com.example.expensetracker.service.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -8,17 +10,22 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
+import java.security.Principal;
 
 @Controller
 public class ExpenseController {
 
     private final ExpenseService service;
+    private final AppUserRepository appUserRepository;
 
-    public ExpenseController(ExpenseService service) {
+    public ExpenseController(ExpenseService service, AppUserRepository appUserRepository) {
         this.service = service;
+        this.appUserRepository = appUserRepository;
+    }
+
+    private AppUser currentUser(Principal principal) {
+        return appUserRepository.findByEmail(principal.getName())
+                .orElseThrow();
     }
 
     @GetMapping("/")
@@ -27,21 +34,14 @@ public class ExpenseController {
     }
 
     @GetMapping("/expenses")
-    public String list(Model model) {
+    public String list(Model model, Principal principal) {
+        AppUser user = currentUser(principal);
 
-        var expenses = service.findAll();
-        var total = service.getTotalSpent();
-
-        // Format as NT$ 1,234.00
-        NumberFormat twdFormat = NumberFormat.getCurrencyInstance(Locale.TAIWAN);
-        String formattedTotal = twdFormat.format(total);
-
-        model.addAttribute("expenses", expenses);
-        model.addAttribute("totalSpent", formattedTotal);
+        model.addAttribute("expenses", service.findByUser(user));
+        model.addAttribute("totalSpent", service.getTotalSpent(user));
 
         return "expenses/list";
     }
-
 
     @GetMapping("/expenses/new")
     public String createForm(Model model) {
@@ -51,35 +51,57 @@ public class ExpenseController {
 
     @PostMapping("/expenses")
     public String create(@Valid @ModelAttribute("expense") Expense expense,
-                         BindingResult result) {
-        if (result.hasErrors()) {
-            return "expenses/form";
-        }
+                         BindingResult result,
+                         Principal principal) {
+
+        if (result.hasErrors()) return "expenses/form";
+
+        AppUser user = currentUser(principal);
+        expense.setUser(user);
+
         service.save(expense);
         return "redirect:/expenses";
     }
 
     @GetMapping("/expenses/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("expense", service.findById(id));
+    public String editForm(@PathVariable Long id, Model model, Principal principal) {
+        AppUser user = currentUser(principal);
+
+        Expense expense = service.findByIdAndUser(id, user); // ✅ secure
+        model.addAttribute("expense", expense);
+
         return "expenses/form";
     }
 
     @PostMapping("/expenses/{id}")
     public String update(@PathVariable Long id,
-                         @Valid @ModelAttribute("expense") Expense expense,
-                         BindingResult result) {
-        if (result.hasErrors()) {
-            return "expenses/form";
-        }
-        expense.setId(id);
-        service.save(expense);
+                         @Valid @ModelAttribute("expense") Expense formExpense,
+                         BindingResult result,
+                         Principal principal) {
+
+        if (result.hasErrors()) return "expenses/form";
+
+        AppUser user = currentUser(principal);
+
+        // ✅ load the existing row for this user
+        Expense existing = service.findByIdAndUser(id, user);
+
+        // ✅ update allowed fields only
+        existing.setDescription(formExpense.getDescription());
+        existing.setCategory(formExpense.getCategory());
+        existing.setExpenseDate(formExpense.getExpenseDate());
+        existing.setAmount(formExpense.getAmount());
+
+        service.save(existing);
+
         return "redirect:/expenses";
     }
 
     @PostMapping("/expenses/{id}/delete")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
+    public String delete(@PathVariable Long id, Principal principal) {
+        AppUser user = currentUser(principal);
+
+        service.delete(id, user); // ✅ FIX for your compile error
         return "redirect:/expenses";
     }
 }
